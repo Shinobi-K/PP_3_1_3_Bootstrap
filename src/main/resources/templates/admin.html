@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Panel</title>
+</head>
+<body>
+<h1>Панель администратора</h1>
+
+<a href="/admin/new">Доббавить пользователя</a>
+<br/><br/>
+
+<table border="1">
+  <tr>
+    <th>ID</th>
+    <th>Имя</th>
+    <th>Фамилия</th>
+    <th>Email</th>
+    <th>Username</th>
+    <th>Роли</th>
+    <th>Действия</th>
+  </tr>
+  <tr th:each="user : ${users}">
+    <td th:text="${user.id}">1</td>
+    <td th:text="${user.name}">Иван</td>
+    <td th:text="${user.lastName}">Иванов</td>
+    <td th:text="${user.email}">ivan@mail.ru</td>
+    <td th:text="${user.username}">ivan</td>
+    <td th:text="${user.roles}">USER</td>
+    <td>
+      <a th:href="@{/admin/edit(id=${user.id})}">Изменить</a>
+      <a th:href="@{/admin/delete(id=${user.id})}">Удалить</a>
+    </td>
+  </tr>
+</table>
+
+<br/>
+<a href="/logout">Выйти</a>
+</body>
+</html>
