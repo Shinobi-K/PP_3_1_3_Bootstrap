@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -23,7 +24,7 @@ public class User implements UserDetails {
     @Column(name = "last_name")
     private String lastName;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "username", unique = true)
@@ -32,18 +33,22 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @Column(name = "age")
+    private Integer age;
+
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id")) private Set<Role> roles = new HashSet<>();
 
     public User() {
     }
 
-    public User(String name, String lastName, String email, String username, String password) {
+    public User(String name, String lastName, String email, String password, Integer age) {
         this.name = name;
         this.lastName = lastName;
         this.email = email;
-        this.username = username;
+        this.username = email;
         this.password = password;
+        this.age = age;
     }
 
     public Long getId() {
@@ -82,6 +87,41 @@ public class User implements UserDetails {
         return username;
     }
 
+    public void setUsername(String username) { this.username = username; }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public String getRolesAsString() {
+        return roles.stream().map(r -> r.getName().replace("ROLE_", "")).sorted().collect(Collectors.joining(","));
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles;
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -102,31 +142,6 @@ public class User implements UserDetails {
         return true;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return roles;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -142,6 +157,6 @@ public class User implements UserDetails {
 
     @Override
     public String toString() {
-        return "User{" + "id=" + id + ", name='" + name + '\'' + ", lastName='" + lastName + '\'' + ", email='" + email + '\'' + ", username='" + username + '\'' + '}';
+        return "User{" + "id=" + id + ", name='" + name + '\'' + ", lastName='" + lastName + '\'' + ", email='" + email + '\'' + ", username='" + username + '\'' + ", age=" + age +'}';
     }
 }

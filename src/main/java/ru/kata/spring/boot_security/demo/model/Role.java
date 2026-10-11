@@ -45,6 +45,11 @@ public class Role implements GrantedAuthority {
     }
 
     @Override
+    public String toString() {
+        return name.replace("ROLE_", "");
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -57,8 +62,4 @@ public class Role implements GrantedAuthority {
         return Objects.hash(id, name);
     }
 
-    @Override
-    public String toString() {
-        return name;
-    }
 }

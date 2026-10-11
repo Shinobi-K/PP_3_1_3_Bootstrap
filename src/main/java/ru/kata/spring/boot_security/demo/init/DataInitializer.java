@@ -26,33 +26,38 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
+
         Role roleUser = roleRepository.findByName("ROLE_USER");
+
         if (roleUser == null) {
             roleUser = new Role("ROLE_USER");
             roleRepository.save(roleUser);
-            System.out.println("ROLE_USER created");
         }
 
         Role roleAdmin = roleRepository.findByName("ROLE_ADMIN");
+
         if (roleAdmin == null) {
             roleAdmin = new Role("ROLE_ADMIN");
             roleRepository.save(roleAdmin);
-            System.out.println("ROLE_ADMIN created");
         }
 
-        User admin = userRepository.findByUsername("admin").orElse(null);
-        if (admin == null) {
-            Set<Role> adminRoles = new HashSet<>();
-            adminRoles.add(roleAdmin);
-            adminRoles.add(roleUser);
+        User admin = userRepository.findByEmail("admin@mail.ru").orElse(null);
 
-            admin = new User("Admin", "Adminov", "admin@mail.ru", "admin", passwordEncoder.encode("admin"));
-            admin.setRoles(adminRoles);
+        if (admin == null) {
+
+            Set<Role> roles = new HashSet<>();
+            roles.add(roleAdmin);
+            roles.add(roleUser);
+
+            admin = new User("Admin", "Adminov", "admin@mail.ru", passwordEncoder.encode("admin"), 35);
+
+            admin.setRoles(roles);
             userRepository.save(admin);
 
-            System.out.println("Admin created : admin / admin");
+            System.out.println("Admin created: admin@mail.ru / admin");
         } else {
             System.out.println("Admin already exists");
         }
     }
 }
+
