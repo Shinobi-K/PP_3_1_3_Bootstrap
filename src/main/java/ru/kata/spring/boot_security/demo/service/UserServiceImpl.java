@@ -8,8 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repository.UserRepository;
+import ru.kata.spring.boot_security.demo.model.Role;
+import ru.kata.spring.boot_security.demo.service.RoleService;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -17,10 +21,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, RoleService roleService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.roleService = roleService;
     }
 
     @Override
@@ -72,5 +78,52 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         return user;
+    }
+
+    @Override
+    public void createUser(String name, String lastName, String email, String password, Integer age, List<Long> roleIds) {
+
+        User user = new User(name, lastName, email, password, age);
+        user.setRoles(getRoles(roleIds));
+        saveUserWithEncryptedPassword(user);
+    }
+
+    @Override
+    public void updateUser(Long id, String name, String lastName, Integer age, String email, String password, List<Long> roleIds) {
+
+        User user = getUserById(id);
+
+        if (user == null) {
+            return;
+        }
+
+        user.setName(name);
+        user.setLastName(lastName);
+        user.setAge(age);
+        user.setEmail(email);
+        user.setUsername(email);
+        user.setRoles(getRoles(roleIds));
+
+        if (password != null && !password.trim().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(password));
+        }
+
+        updateUser(user);
+    }
+
+    private Set<Role> getRoles(List<Long> roleIds) {
+        Set<Role> roles = new HashSet<>();
+
+        if (roleIds != null) {
+            for (Long roleId : roleIds) {
+                Role role = roleService.findById(roleId);
+
+                if (role != null) {
+                    roles.add(role);
+                }
+            }
+        }
+
+        return roles;
     }
 }

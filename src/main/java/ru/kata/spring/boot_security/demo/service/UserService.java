@@ -11,4 +11,8 @@ public interface UserService {
     void updateUser(User user);
     void deleteUser(Long id);
     User findByUsername(String username);
+
+    void createUser(String name, String lastName, String email, String password, Integer age, List<Long> roleIds);
+
+    void updateUser(Long id, String name, String lastName, Integer age, String email, String password, List<Long> roleIds);
 }
